@@ -1,0 +1,122 @@
+{% extends "core/base.html" %}
+{% block title %}Overview{% endblock %}
+{% block content %}
+<div class="section-title">
+  <div>
+    <h1>Security Posture Overview</h1>
+    <p class="sub"><span class="live-dot"></span>World Monitor Local Lab — Authorized Assessment Workspace, live view</p>
+  </div>
+</div>
+
+<div class="grid g4" style="margin-bottom:16px">
+  <div class="card kpi clickable" style="display:flex;align-items:center;gap:14px"
+       data-explain data-explain-eyebrow="Composite score" data-explain-title="Security Posture Score"
+       data-explain-body="<div class='mstat'><span>Current score</span><b>{{ posture_score }} / 100</b></div><div class='mstat'><span>Trend</span><b>+4 vs last week</b></div><p style='margin-top:12px'>Weighted blend of open findings, severity mix, fix-verification rate, and scope coverage across the AI Firewall, Protocol Shield, Desktop Guard, and Attack Surface modules. Resolving Critical/High findings raises this score fastest.</p>">
+    <svg width="78" height="78" viewBox="0 0 78 78">
+      <circle cx="39" cy="39" r="32" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
+      <circle class="gauge-ring" data-pct="{{ posture_score }}" cx="39" cy="39" r="32" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" transform="rotate(-90 39 39)"/>
+      <text x="39" y="44" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">{{ posture_score }}</text>
+    </svg>
+    <div><div class="val" data-count="{{ posture_score }}">{{ posture_score }}</div><div class="lbl">Security Posture Score / 100</div></div>
+  </div>
+  <div class="card kpi clickable" data-explain data-explain-eyebrow="Open work" data-explain-title="Open Findings"
+       data-explain-body="<div class='mstat'><span>Currently open</span><b>{{ open_findings }}</b></div><p style='margin-top:12px'>Findings across all modules that are not yet marked Resolved. View the full list on the Findings page, filterable by severity and status.</p>">
+    <div class="ikon">&#9650;</div><div class="val" data-count="{{ open_findings }}">{{ open_findings }}</div><div class="lbl">Open Findings</div></div>
+  <div class="card kpi crit clickable" data-explain data-explain-eyebrow="Needs attention" data-explain-title="Critical Findings"
+       data-explain-body="<div class='mstat'><span>Critical &amp; unresolved</span><b>{{ critical_findings }}</b></div><p style='margin-top:12px'>These carry the highest CVSS scores and mission risk. Prioritize these first in the Priority Remediation Queue below.</p>">
+    <div class="ikon">&#9940;</div><div class="val" data-count="{{ critical_findings }}">{{ critical_findings }}</div><div class="lbl">Critical Findings</div></div>
+  <div class="card kpi good clickable" data-explain data-explain-eyebrow="Verified fixes" data-explain-title="Fixes Verified"
+       data-explain-body="<div class='mstat'><span>Proof-of-fix certificates issued</span><b>{{ fixes_verified }}</b></div><p style='margin-top:12px'>Each certificate means the original vulnerability was safely retested post-patch and confirmed blocked. See Fix Validation for the full certificate history.</p>">
+    <div class="ikon">&#10003;</div><div class="val" data-count="{{ fixes_verified }}">{{ fixes_verified }}</div><div class="lbl">Fixes Verified</div></div>
+</div>
+
+<div class="grid g4" style="margin-bottom:16px">
+  <div class="card kpi clickable" data-explain data-explain-eyebrow="AI Trust Firewall" data-explain-title="AI Inputs Scanned"
+       data-explain-body="<div class='mstat'><span>Total scanned</span><b>12,847</b></div><p style='margin-top:12px'>External articles and feed content passed through prompt-injection and instruction/data-separation checks before reaching AI summarization.</p>">
+    <div class="ikon">&#10022;</div><div class="val" data-count="12847">12,847</div><div class="lbl">AI Inputs Scanned</div></div>
+  <div class="card kpi clickable" data-explain data-explain-eyebrow="Protocol Safety Shield" data-explain-title="API/Protocol Events Validated"
+       data-explain-body="<div class='mstat'><span>Total validated</span><b>48,292</b></div><p style='margin-top:12px'>Schema, range, replay, and timestamp-freshness checks applied to inbound API and event-stream traffic.</p>">
+    <div class="ikon">&#8644;</div><div class="val" data-count="48292">48,292</div><div class="lbl">API/Protocol Events Validated</div></div>
+  <div class="card kpi clickable" data-explain data-explain-eyebrow="Desktop Trust Guard" data-explain-title="Desktop IPC Commands Assessed"
+       data-explain-body="<div class='mstat'><span>Commands assessed</span><b>18</b></div><p style='margin-top:12px'>Every IPC command exposed by the desktop shell is inventoried with origin policy, parameter validation, and a manual block switch. See Desktop Trust Guard.</p>">
+    <div class="ikon">&#8962;</div><div class="val" data-count="18">18</div><div class="lbl">Desktop IPC Commands Assessed</div></div>
+  <div class="card kpi good clickable" style="display:flex;align-items:center;gap:14px"
+       data-explain data-explain-eyebrow="Assessment breadth" data-explain-title="Scope Coverage"
+       data-explain-body="<div class='mstat'><span>Covered</span><b>{{ scope_coverage }}%</b></div><p style='margin-top:12px'>Share of the authorized World Monitor local-lab scope (AI layer, API layer, desktop layer, data layer) that has been actively assessed so far.</p>">
+    <svg width="78" height="78" viewBox="0 0 78 78">
+      <circle cx="39" cy="39" r="32" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="7"/>
+      <circle class="gauge-ring" data-pct="{{ scope_coverage }}" cx="39" cy="39" r="32" fill="none" stroke="#6FE0A8" stroke-width="7" stroke-linecap="round" transform="rotate(-90 39 39)"/>
+      <text x="39" y="44" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">{{ scope_coverage }}%</text>
+    </svg>
+    <div><div class="val">{{ scope_coverage }}%</div><div class="lbl">Scope Coverage</div></div>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-bottom:16px">
+  <div class="card chart-card">
+    <h3>Open Findings — 14-Day Trend</h3>
+    <div class="chart-scroll">
+      <div data-chart="line" data-points="{{ trend_values }}" data-labels="{{ trend_labels }}" data-color="#E8C468" data-unit=" open"></div>
+    </div>
+    <p class="lbl" style="margin-top:6px">Click a point on the line for that day's detail.</p>
+  </div>
+  <div class="card chart-card">
+    <h3>Findings by Severity</h3>
+    <div class="chart-scroll">
+      <div data-chart="bar" data-points="{{ sev_bar_values }}" data-labels="{{ sev_bar_labels }}" data-colors="{{ sev_bar_colors }}"></div>
+    </div>
+    <p class="lbl" style="margin-top:6px">Click a bar to see what that severity tier means.</p>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-bottom:16px">
+  <div class="card chart-card" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+    <div data-chart="donut" data-points="{{ module_values }}" data-labels="{{ module_labels }}" data-colors="{{ module_colors }}"></div>
+    <div style="flex:1;min-width:180px">
+      <h3 style="margin-bottom:6px">Findings by Module</h3>
+      <p class="lbl">Distribution of tracked findings across the four Sentinel Trinity monitoring modules. Click a segment for its share of the total.</p>
+    </div>
+  </div>
+  <div class="card chart-card" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
+    <div data-chart="donut" data-points="{{ coverage_values }}" data-labels="{{ coverage_labels }}" data-colors="{{ coverage_colors }}"></div>
+    <div style="flex:1;min-width:180px">
+      <h3 style="margin-bottom:6px">Assessment Scope Coverage</h3>
+      <p class="lbl">Share of the authorized World Monitor lab scope actively scanned versus remaining. Click a segment for detail.</p>
+    </div>
+  </div>
+</div>
+
+<div class="grid g2" style="margin-bottom:16px">
+  <div class="card">
+    <h3>Findings by Severity</h3>
+    <table><tbody>
+    {% for row in severity_counts %}
+      <tr class="row-clickable" data-explain data-explain-eyebrow="Severity tier" data-explain-title="{{ row.severity }} findings"
+          data-explain-body="<div class='mstat'><span>Count</span><b>{{ row.n }}</b></div><p style='margin-top:12px'>Open the Findings page and filter by severity = {{ row.severity }} to review each item individually.</p>">
+      <td>{{ row.severity }}</td><td style="text-align:right"><span class="pill {% if row.severity == 'Critical' %}crit{% elif row.severity == 'High' %}high{% elif row.severity == 'Medium' %}med{% else %}low{% endif %}">{{ row.n }}</span></td></tr>
+    {% endfor %}
+    </tbody></table>
+  </div>
+  <div class="card">
+    <h3>Recent Security Events</h3>
+    <table><tbody>
+    {% for e in recent_events %}
+      <tr class="row-clickable" data-explain data-explain-eyebrow="Security event" data-explain-title="{{ e.message }}"
+          data-explain-body="<div class='mstat'><span>Level</span><b>{{ e.level|upper }}</b></div><div class='mstat'><span>Occurred</span><b>{{ e.occurred_at|timesince }} ago</b></div><p style='margin-top:12px'>Live security telemetry captured by Sentinel Trinity's monitoring modules during the current assessment session.</p>">
+      <td>{% if e.level == 'critical' %}&#128308;{% elif e.level == 'warn' %}&#128992;{% else %}&#128994;{% endif %}</td><td>{{ e.message }}</td><td class="lbl">{{ e.occurred_at|timesince }} ago</td></tr>
+    {% endfor %}
+    </tbody></table>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Priority Remediation Queue</h3>
+  <table><thead><tr><th>Finding</th><th>Sev</th><th>Owner</th><th>Status</th></tr></thead><tbody>
+  {% for f in priority_queue %}
+    <tr><td><a href="{% url 'finding_detail' f.finding_id %}">{{ f.finding_id }}</a></td>
+    <td><span class="pill {% if f.severity == 'Critical' %}crit{% elif f.severity == 'High' %}high{% elif f.severity == 'Medium' %}med{% else %}low{% endif %}">{{ f.severity }}</span></td>
+    <td>{{ f.owner }}</td><td>{{ f.status }}</td></tr>
+  {% endfor %}
+  </tbody></table>
+</div>
+{% endblock %}

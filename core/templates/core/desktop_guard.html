@@ -1,0 +1,28 @@
+{% extends "core/base.html" %}
+{% block title %}Desktop Trust Guard{% endblock %}
+{% block content %}
+<h1>Desktop Trust Guard</h1>
+<p class="sub">Securing the web-to-desktop trust boundary, IPC commands, sidecar permissions, and local-device access.</p>
+
+<div class="card">
+<h3>IPC Command Inventory</h3>
+<table><thead><tr><th>Command</th><th>Risk</th><th>Origin Policy</th><th>Param Validation</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+{% for c in commands %}
+<tr class="row-clickable" data-explain data-explain-eyebrow="IPC command" data-explain-title="{{ c.name }}" data-explain-body="<div class='mstat'><span>Risk</span><b>{{ c.risk }}</b></div><div class='mstat'><span>Origin policy</span><b>{{ c.origin_policy }}</b></div><div class='mstat'><span>Param validation</span><b>{{ c.param_validation }}</b></div><div class='mstat'><span>Status</span><b>{{ c.status }}</b></div><p style='margin-top:12px'>This command is exposed by the desktop shell's IPC bridge. Use the row actions to safely test it or toggle it blocked without leaving this page.</p>">
+  <td>{{ c.name }}</td>
+  <td><span class="pill {% if c.risk == 'Critical' %}crit{% elif c.risk == 'High' %}high{% elif c.risk == 'Medium' %}med{% else %}low{% endif %}">{{ c.risk }}</span></td>
+  <td>{{ c.origin_policy }}</td>
+  <td><span class="pill pass">{{ c.param_validation }}</span></td>
+  <td><span class="pill {% if c.status == 'Allowed' %}pass{% elif c.status == 'Blocked' %}fail{% else %}warn{% endif %}">{{ c.status }}</span></td>
+  <td>
+    <form method="post" style="display:inline">{% csrf_token %}
+      <input type="hidden" name="name" value="{{ c.name }}">
+      <button class="btn" name="action" value="test_safely" type="submit">Test Safely</button>
+      <button class="btn danger" name="action" value="block" type="submit">{% if c.status == 'Blocked' %}Unblock{% else %}Block{% endif %}</button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

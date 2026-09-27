@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+{% block title %}Evidence Vault{% endblock %}
+{% block content %}
+<h1>Evidence Vault</h1>
+<p class="sub">Tamper-evident, sanitized evidence for authorized security assessments.</p>
+
+<form method="get" class="searchbar">
+  <input type="text" name="q" placeholder="Search evidence..." value="{{ q }}">
+  <select name="type" onchange="this.form.submit()">
+    <option value="">All Types</option>
+    {% for val, label in types %}
+      <option value="{{ val }}" {% if etype == val %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+  <button class="btn primary" type="submit">Filter</button>
+</form>
+
+<div class="card">
+<table><thead><tr><th>ID</th><th>Type</th><th>Finding</th><th>Captured By</th><th>Timestamp</th><th>Redacted</th><th>Hash</th></tr></thead><tbody>
+{% for e in items %}
+<tr class="row-clickable" data-explain data-explain-eyebrow="Evidence item" data-explain-title="{{ e.evidence_id }}" data-explain-body="<div class='mstat'><span>Type</span><b>{{ e.evidence_type }}</b></div><div class='mstat'><span>Captured by</span><b>{{ e.captured_by }}</b></div><div class='mstat'><span>Timestamp</span><b>{{ e.captured_at|date:'M d, Y H:i' }}</b></div><div class='mstat'><span>Redacted</span><b>{% if e.redacted %}Yes{% else %}N/A{% endif %}</b></div><p style='margin-top:12px;word-break:break-all'>SHA-256: {{ e.sha256 }}</p>">
+  <td>{{ e.evidence_id }}</td><td>{{ e.evidence_type }}</td>
+  <td>{% if e.finding %}<a href="{% url 'finding_detail' e.finding.finding_id %}">{{ e.finding.finding_id }}</a>{% else %}—{% endif %}</td>
+  <td>{{ e.captured_by }}</td><td>{{ e.captured_at|date:"M d, Y H:i" }}</td>
+  <td>{% if e.redacted %}Yes{% else %}N/A{% endif %}</td>
+  <td class="mono" style="padding:4px 8px">{{ e.sha256 }}</td>
+</tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "core/base.html" %}
+{% block title %}{{ finding.finding_id }}{% endblock %}
+{% block content %}
+<a href="{% url 'findings_list' %}" class="btn" style="margin-bottom:14px;display:inline-block">&larr; Back to Findings</a>
+<h1>{{ finding.finding_id }}</h1>
+<span class="pill info">Controlled Local Demonstration / Simulated Finding</span>
+<p class="sub" style="margin-top:10px">{{ finding.title }}</p>
+
+<div class="grid g2" style="margin-bottom:16px">
+  <div class="card">
+    <h3>Details</h3>
+    <table><tbody>
+    <tr><td>Severity</td><td><span class="pill {% if finding.severity == 'Critical' %}crit{% elif finding.severity == 'High' %}high{% elif finding.severity == 'Medium' %}med{% else %}low{% endif %}">{{ finding.severity }}</span></td></tr>
+    <tr><td>CVSS</td><td>{{ finding.cvss }}</td></tr>
+    <tr><td>Module</td><td>{{ finding.module }}</td></tr>
+    <tr><td>Affected Component</td><td>{{ finding.component }}</td></tr>
+    <tr><td>Mission Risk</td><td>{{ finding.mission_risk }}</td></tr>
+    <tr><td>Fix Owner</td><td>{{ finding.owner }}</td></tr>
+    <tr><td>Status</td><td><span class="pill {% if finding.status == 'Resolved' %}pass{% elif finding.status == 'In Progress' %}warn{% else %}fail{% endif %}">{{ finding.status }}</span></td></tr>
+    <tr><td>Updated</td><td>{{ finding.updated_at|date:"M d, Y H:i" }}</td></tr>
+    </tbody></table>
+  </div>
+  <div class="card">
+    <h3>Safe Proof-of-Concept Steps</h3>
+    <div class="mono">{{ finding.poc_steps }}</div>
+    <h3 style="margin-top:14px">Remediation Recommendation</h3>
+    <p style="font-size:13px">{{ finding.remediation }}</p>
+  </div>
+</div>
+
+<div class="card" style="margin-bottom:16px">
+  <h3>Actions</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <form method="post" style="display:inline">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="mark_validated">
+      <button class="btn primary" type="submit">Mark Validated</button>
+    </form>
+    <form method="post" style="display:inline">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="assign_owner">
+      <button class="btn" type="submit">Reassign Owner</button>
+    </form>
+    <a class="btn" href="{% url 'fix_validation' %}">Start Retest</a>
+  </div>
+</div>
+
+<div class="grid g2">
+  <div class="card">
+    <h3>Linked Evidence</h3>
+    <table><tbody>
+    {% for e in evidence %}
+      <tr><td>{{ e.evidence_id }}</td><td>{{ e.evidence_type }}</td><td>{{ e.captured_by }}</td></tr>
+    {% empty %}
+      <tr><td class="lbl">No evidence linked yet.</td></tr>
+    {% endfor %}
+    </tbody></table>
+  </div>
+  <div class="card">
+    <h3>Certificates</h3>
+    <table><tbody>
+    {% for c in certificates %}
+      <tr><td>{{ c.cert_id }}</td><td><span class="pill pass">{{ c.test_result }}</span></td><td>{{ c.issued_at|date:"M d, Y" }}</td></tr>
+    {% empty %}
+      <tr><td class="lbl">No certificates issued yet.</td></tr>
+    {% endfor %}
+    </tbody></table>
+  </div>
+</div>
+{% endblock %}

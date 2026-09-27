@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sign in — Sentinel Trinity</title>
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+<style>
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;}
+.login-orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.35;animation:orbFloat 9s ease-in-out infinite;}
+.login-orb.o1{width:420px;height:420px;background:radial-gradient(circle,#ffffff,transparent 70%);top:-140px;left:-120px;}
+.login-orb.o2{width:360px;height:360px;background:radial-gradient(circle,#6FE0A8,transparent 70%);bottom:-140px;right:-100px;animation-delay:2s;}
+.login-orb.o3{width:260px;height:260px;background:radial-gradient(circle,#E8C468,transparent 70%);top:40%;right:10%;animation-delay:4s;}
+@keyframes orbFloat{0%,100%{transform:translateY(0) translateX(0);}50%{transform:translateY(-24px) translateX(14px);}}
+.login-card{position:relative;z-index:2;width:100%;max-width:410px;background:linear-gradient(155deg,rgba(255,255,255,0.06),rgba(255,255,255,0.02));backdrop-filter:blur(24px);border:1px solid var(--bd);border-radius:26px;padding:38px 34px 32px;box-shadow:var(--shadow-lg);animation:fadeUp .6s cubic-bezier(.2,.8,.2,1) both;}
+.login-brand{display:flex;align-items:center;gap:11px;margin-bottom:26px;}
+.login-brand .dot{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#fff,#8b8b93);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;color:#0A0A0B;box-shadow:0 6px 18px rgba(255,255,255,.18);}
+.login-brand b{font-size:16px;letter-spacing:.02em;font-weight:700;}
+.login-brand .sub-brand{font-size:11px;color:var(--tx2);display:block;margin-top:1px;letter-spacing:.03em;}
+.login-title{font-size:22px;font-weight:700;color:#fff;margin:0 0 4px;letter-spacing:-0.02em;}
+.login-sub{color:var(--tx2);font-size:13px;margin:0 0 26px;}
+.login-field{margin-bottom:16px;}
+.login-field label{display:block;font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:7px;text-transform:uppercase;letter-spacing:.05em;}
+.login-field input{width:100%;}
+.login-errors{background:rgba(240,102,90,.1);border:1px solid rgba(240,102,90,.3);color:var(--red);font-size:12.5px;padding:10px 14px;border-radius:11px;margin-bottom:18px;animation:fadeUp .3s both;}
+.login-btn{width:100%;padding:12px;font-size:14px;margin-top:6px;}
+.login-foot{margin-top:22px;text-align:center;font-size:11.5px;color:var(--tx2);}
+.login-badge-row{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-orb o1"></div>
+  <div class="login-orb o2"></div>
+  <div class="login-orb o3"></div>
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="dot">ST</div>
+      <div><b>SENTINEL TRINITY</b><span class="sub-brand">Security Assessment Platform</span></div>
+    </div>
+    <h1 class="login-title">Welcome back</h1>
+    <p class="login-sub">Sign in to access the World Monitor local-lab workspace.</p>
+
+    {% if form.errors %}
+      <div class="login-errors">Incorrect username or password. Please try again.</div>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      <div class="login-field">
+        <label for="id_username">Username</label>
+        <input type="text" name="username" id="id_username" autocomplete="username" autofocus required>
+      </div>
+      <div class="login-field">
+        <label for="id_password">Password</label>
+        <input type="password" name="password" id="id_password" autocomplete="current-password" required>
+      </div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button class="btn primary login-btn" type="submit">Sign In</button>
+    </form>
+
+    <div class="login-badge-row">
+      <span class="badge">&#9679; Authorized Local Environment</span>
+    </div>
+    <p class="login-foot">Access restricted to authorized analysts. Production scanning is disabled.</p>
+  </div>
+</div>
+<script src="{% static 'core/js/app.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{% extends "core/base.html" %}
+{% block title %}Findings{% endblock %}
+{% block content %}
+<h1>Security Findings</h1>
+<p class="sub">Evidence-backed vulnerabilities and security control gaps.</p>
+
+<div class="card" style="margin-bottom:14px">
+  <h3>Severity Distribution</h3>
+  <div class="donut-legend">
+    <span><i class="dot-sw" style="background:#F0665A"></i>Critical ({{ sev_counts.Critical|default:0 }})</span>
+    <span><i class="dot-sw" style="background:#E8C468"></i>High ({{ sev_counts.High|default:0 }})</span>
+    <span><i class="dot-sw" style="background:#B9B9C4"></i>Medium ({{ sev_counts.Medium|default:0 }})</span>
+    <span><i class="dot-sw" style="background:#6FE0A8"></i>Low ({{ sev_counts.Low|default:0 }})</span>
+  </div>
+  <div class="chart-scroll" style="margin-top:14px">
+    <div data-chart="bar"
+      data-points="{{ sev_counts.Critical|default:0 }},{{ sev_counts.High|default:0 }},{{ sev_counts.Medium|default:0 }},{{ sev_counts.Low|default:0 }}"
+      data-labels="Critical,High,Medium,Low" data-colors="#F0665A,#E8C468,#B9B9C4,#6FE0A8"></div>
+  </div>
+</div>
+
+<form method="get" class="searchbar">
+  <input type="text" name="q" placeholder="Search findings..." value="{{ q }}">
+  <select name="severity" onchange="this.form.submit()">
+    <option value="">All Severities</option>
+    <option value="Critical" {% if severity == "Critical" %}selected{% endif %}>Critical</option>
+    <option value="High" {% if severity == "High" %}selected{% endif %}>High</option>
+    <option value="Medium" {% if severity == "Medium" %}selected{% endif %}>Medium</option>
+    <option value="Low" {% if severity == "Low" %}selected{% endif %}>Low</option>
+  </select>
+  <select name="status" onchange="this.form.submit()">
+    <option value="">All Status</option>
+    <option value="Open" {% if status == "Open" %}selected{% endif %}>Open</option>
+    <option value="In Progress" {% if status == "In Progress" %}selected{% endif %}>In Progress</option>
+    <option value="Resolved" {% if status == "Resolved" %}selected{% endif %}>Resolved</option>
+  </select>
+  <button class="btn primary" type="submit">Filter</button>
+</form>
+
+<div class="card">
+<table><thead><tr><th>ID</th><th>Title</th><th>Module</th><th>Severity</th><th>CVSS</th><th>Status</th><th>Owner</th><th>Updated</th></tr></thead><tbody>
+{% for f in findings %}
+<tr onclick="window.location='{% url 'finding_detail' f.finding_id %}'" style="cursor:pointer">
+  <td>{{ f.finding_id }}</td><td>{{ f.title }}</td><td>{{ f.module }}</td>
+  <td><span class="pill {% if f.severity == 'Critical' %}crit{% elif f.severity == 'High' %}high{% elif f.severity == 'Medium' %}med{% else %}low{% endif %}">{{ f.severity }}</span></td>
+  <td>{{ f.cvss }}</td>
+  <td><span class="pill {% if f.status == 'Resolved' %}pass{% elif f.status == 'In Progress' %}warn{% else %}fail{% endif %}">{{ f.status }}</span></td>
+  <td>{{ f.owner }}</td><td>{{ f.updated_at|date:"M d, Y" }}</td>
+</tr>
+{% empty %}
+<tr><td colspan="8" class="lbl">No findings match your filters.</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "core/base.html" %}
+{% block title %}Protocol Safety Shield{% endblock %}
+{% block content %}
+<h1>Protocol Safety Shield</h1>
+<p class="sub">Schema-aware protection for APIs, event streams, and protocol messages.</p>
+
+<div class="grid g2">
+  <div class="card">
+    <h3>Mock Event Payload</h3>
+    <form method="post">
+      {% csrf_token %}
+      <textarea name="payload" rows="12">{{ payload }}</textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn" name="action" value="load_valid" type="submit">Load Valid Payload</button>
+        <button class="btn" name="action" value="load_invalid" type="submit">Load Invalid Payload</button>
+        <button class="btn primary" name="action" value="validate" type="submit">Validate Payload</button>
+      </div>
+    </form>
+  </div>
+  <div class="card">
+    <h3>Validation Result</h3>
+    {% if checks %}
+    <table><tbody>
+    {% for name, status in checks %}
+      <tr class="row-clickable" data-explain data-explain-eyebrow="Validation check" data-explain-title="{{ name }}" data-explain-body="<div class='mstat'><span>Result</span><b>{{ status|upper }}</b></div><p style='margin-top:12px'>Part of the schema-aware protocol validation pipeline that inspects every inbound event payload before it is trusted downstream.</p>">
+        <td>{{ name }}</td><td><span class="pill {{ status }}">{{ status|upper }}</span></td></tr>
+    {% endfor %}
+    </tbody></table>
+    {% if invalid_result %}
+    <form method="post" style="margin-top:10px">{% csrf_token %}
+      <input type="hidden" name="payload" value="{{ payload }}">
+      <button class="btn danger" name="action" value="quarantine" type="submit">Quarantine Payload</button>
+    </form>
+    {% endif %}
+    {% else %}
+      <p class="lbl">Run validation to see results.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

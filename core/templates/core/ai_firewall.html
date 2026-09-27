@@ -1,0 +1,73 @@
+{% extends "core/base.html" %}
+{% block title %}AI Trust Firewall{% endblock %}
+{% block content %}
+<h1>AI Trust Firewall</h1>
+<p class="sub">Protecting AI summaries and intelligence workflows from malicious external content.</p>
+
+<div class="tabs">
+  <a class="tab {% if tab == 'scan' %}active{% endif %}" href="?tab=scan">Live Content Scanner</a>
+  <a class="tab {% if tab == 'quarantine' %}active{% endif %}" href="?tab=quarantine">Quarantine Queue</a>
+</div>
+
+{% if tab == 'quarantine' %}
+<div class="card">
+<table><thead><tr><th>ID</th><th>Source</th><th>Threat Type</th><th>Risk</th><th>Status</th><th>Actions</th></tr></thead><tbody>
+{% for q in quarantine_items %}
+<tr class="row-clickable" data-explain data-explain-eyebrow="Quarantined content" data-explain-title="{{ q.quarantine_id }}" data-explain-body="<div class='mstat'><span>Source</span><b>{{ q.source }}</b></div><div class='mstat'><span>Threat type</span><b>{{ q.threat_type }}</b></div><div class='mstat'><span>Risk</span><b>{{ q.risk }}</b></div><div class='mstat'><span>Status</span><b>{{ q.status }}</b></div><p style='margin-top:12px'>Content held here was flagged by the AI Trust Firewall before it could reach the summarization pipeline. Approve to release it, or Reject to discard permanently.</p>">
+  <td>{{ q.quarantine_id }}</td><td>{{ q.source }}</td><td>{{ q.threat_type }}</td>
+  <td><span class="pill {% if q.risk == 'Critical' %}crit{% elif q.risk == 'High' %}high{% elif q.risk == 'Medium' %}med{% else %}low{% endif %}">{{ q.risk }}</span></td>
+  <td><span class="pill {% if q.status == 'Approved' %}pass{% elif q.status == 'Rejected' %}fail{% else %}warn{% endif %}">{{ q.status }}</span></td>
+  <td>
+    <form method="post" style="display:inline">{% csrf_token %}
+      <input type="hidden" name="qid" value="{{ q.quarantine_id }}">
+      <button class="btn" name="action" value="approve" type="submit">Approve</button>
+      <button class="btn danger" name="action" value="reject" type="submit">Reject</button>
+    </form>
+  </td>
+</tr>
+{% endfor %}
+</tbody></table>
+</div>
+
+{% else %}
+<div class="grid g2">
+  <div class="card">
+    <h3>Paste External Article or Feed Content</h3>
+    <form method="post">
+      {% csrf_token %}
+      <textarea name="article" rows="9">{{ article }}</textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn primary" name="action" value="analyze" type="submit">Analyze Content</button>
+        <button class="btn" name="action" value="load_injection" type="submit">Load Prompt Injection Demo</button>
+        <button class="btn" name="action" value="clear" type="submit">Clear</button>
+      </div>
+    </form>
+    <div class="flowbar">
+      <span class="step">External Content</span>&rarr;<span class="step">Sanitization</span>&rarr;<span class="step">Prompt Boundary</span>&rarr;<span class="step">AI Sandbox</span>&rarr;<span class="step">Citation Check</span>&rarr;<span class="step">Human Approval</span>
+    </div>
+    {% if result %}
+    <div class="card" style="margin-top:12px">
+    <table><tbody>
+    <tr><td>Injection Risk Score</td><td><span class="pill {% if result.flagged %}crit{% else %}pass{% endif %}">{{ result.risk_score }} / 100</span></td></tr>
+    <tr><td>Detected Manipulation Patterns</td><td>{{ result.patterns }}</td></tr>
+    <tr><td>Hidden Content Detected</td><td>{{ result.hidden }}</td></tr>
+    <tr><td>Instruction/Data Separation</td><td><span class="pill {% if result.flagged %}fail{% else %}pass{% endif %}">{{ result.separation }}</span></td></tr>
+    <tr><td>Source Trust Score</td><td>{{ result.trust_score }} / 100</td></tr>
+    <tr><td>Recommended Action</td><td>{{ result.action_rec }}</td></tr>
+    </tbody></table>
+    </div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h3>Safe AI Summary</h3>
+    {% if result %}
+      <p style="font-size:13px">Port Authority confirmed routine Berth 4 maintenance next week; no disruption expected.
+      {% if result.flagged %}<b style="color:#E8C468">Embedded instruction-override content was stripped before summarization.</b>{% endif %}</p>
+      <div class="pill {% if result.flagged %}warn{% else %}pass{% endif %}">{% if result.flagged %}Approval Required{% else %}Auto-approved{% endif %}</div>
+    {% else %}
+      <p class="lbl">Run an analysis to generate a safe, sanitized summary.</p>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "core/base.html" %}
+{% block title %}Fix Validation{% endblock %}
+{% block content %}
+<h1>Fix Validation and Proof of Protection</h1>
+<p class="sub">Replay the same safe test after remediation and verify the vulnerability is blocked.</p>
+
+<div class="card" style="margin-bottom:16px">
+  <h3>Run Safe Retest</h3>
+  <p class="lbl">Generates a proof-of-fix certificate for the next open finding by priority and marks it resolved.</p>
+  <form method="post">{% csrf_token %}
+    <button class="btn primary" name="action" value="generate_cert" type="submit">Run Safe Retest &amp; Generate Certificate</button>
+  </form>
+  {% if new_cert %}
+  <div class="card" style="margin-top:14px">
+    <h3>Proof-of-Fix Certificate — Issued</h3>
+    <table><tbody>
+    <tr><td>Certificate ID</td><td>{{ new_cert.cert_id }}</td></tr>
+    <tr><td>Finding</td><td>{{ new_cert.finding.finding_id }}</td></tr>
+    <tr><td>Patch Reference</td><td>{{ new_cert.patch_reference }}</td></tr>
+    <tr><td>Test Result</td><td><span class="pill pass">{{ new_cert.test_result }}</span></td></tr>
+    <tr><td>Evidence Hash</td><td>{{ new_cert.evidence_hash }}</td></tr>
+    <tr><td>Signed By</td><td>{{ new_cert.signed_by }}</td></tr>
+    </tbody></table>
+  </div>
+  {% endif %}
+</div>
+
+<div class="card">
+<h3>Certificate History</h3>
+<table><thead><tr><th>Cert ID</th><th>Finding</th><th>Component</th><th>Result</th><th>Issued</th></tr></thead><tbody>
+{% for c in certificates %}
+<tr><td>{{ c.cert_id }}</td><td>{{ c.finding.finding_id }}</td><td>{{ c.finding.component }}</td>
+<td><span class="pill pass">{{ c.test_result }}</span></td><td>{{ c.issued_at|date:"M d, Y" }}</td></tr>
+{% empty %}
+<tr><td class="lbl" colspan="5">No certificates issued yet.</td></tr>
+{% endfor %}
+</tbody></table>
+</div>
+{% endblock %}

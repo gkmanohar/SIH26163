@@ -1,0 +1,74 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sentinel Trinity — {% block title %}Security Assessment Platform{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+</head>
+<body>
+<div class="toast-wrap" id="toastWrap">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="toast">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<div class="sidebar-scrim" id="sidebarScrim"></div>
+
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <div class="brand"><div class="dot">ST</div><b>SENTINEL TRINITY</b>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close menu">&times;</button>
+    </div>
+    <nav>
+      <a class="navitem {% if active_page == 'overview' %}active{% endif %}" href="{% url 'dashboard' %}"><span class="ic">&#9673;</span><span>Overview</span></a>
+      <a class="navitem {% if active_page == 'attack' %}active{% endif %}" href="{% url 'attack_surface' %}"><span class="ic">&#9670;</span><span>Attack Surface</span></a>
+      <a class="navitem {% if active_page == 'ai' %}active{% endif %}" href="{% url 'ai_firewall' %}"><span class="ic">&#9889;</span><span>AI Trust Firewall</span></a>
+      <a class="navitem {% if active_page == 'protocol' %}active{% endif %}" href="{% url 'protocol_shield' %}"><span class="ic">&#9878;</span><span>Protocol Safety Shield</span></a>
+      <a class="navitem {% if active_page == 'desktop' %}active{% endif %}" href="{% url 'desktop_guard' %}"><span class="ic">&#8962;</span><span>Desktop Trust Guard</span></a>
+      <a class="navitem {% if active_page == 'findings' %}active{% endif %}" href="{% url 'findings_list' %}"><span class="ic">&#9650;</span><span>Findings</span></a>
+      <a class="navitem {% if active_page == 'evidence' %}active{% endif %}" href="{% url 'evidence_vault' %}"><span class="ic">&#9635;</span><span>Evidence Vault</span></a>
+      <a class="navitem {% if active_page == 'fix' %}active{% endif %}" href="{% url 'fix_validation' %}"><span class="ic">&#10003;</span><span>Fix Validation</span></a>
+      <a class="navitem {% if active_page == 'reports' %}active{% endif %}" href="{% url 'reports' %}"><span class="ic">&#9638;</span><span>Security Reports</span></a>
+      <a class="navitem {% if active_page == 'settings' %}active{% endif %}" href="{% url 'settings_page' %}"><span class="ic">&#9881;</span><span>Settings</span></a>
+    </nav>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+        <button class="hamburger" id="hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+        <span class="badge">&#9679; Authorized Local Environment</span>
+        <span class="tgt">Target: World Monitor – Local Lab (http://localhost:3000)</span>
+      </div>
+      <div class="top-right">
+        <span class="safety">Production scanning disabled</span>
+        <div class="user-menu">
+          <div class="avatar">{{ request.user.username|slice:":2"|upper }}</div>
+          <form method="post" action="{% url 'logout' %}" style="display:inline">
+            {% csrf_token %}
+            <button class="btn" type="submit" title="Log out">Log Out</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-panel" id="modalPanel" role="dialog" aria-modal="true">
+    <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+    <div class="modal-eyebrow" id="modalEyebrow">Detail</div>
+    <h2 class="modal-title" id="modalTitle"></h2>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script src="{% static 'core/js/app.js' %}"></script>
+</body>
+</html>

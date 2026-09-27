@@ -1,0 +1,33 @@
+{% extends "core/base.html" %}
+{% block title %}Reports{% endblock %}
+{% block content %}
+<h1>Reports and Compliance</h1>
+<p class="sub">Executive, technical, and developer-ready security documentation.</p>
+
+<div class="card" style="margin-bottom:16px">
+  <h3>Assessment Completion Score</h3>
+  <div class="grid g4">
+    <div><div class="lbl">Scope Coverage</div><div class="progress"><div style="width:92%"></div></div><div class="lbl">92%</div></div>
+    <div><div class="lbl">Evidence Completeness</div><div class="progress"><div style="width:88%"></div></div><div class="lbl">88%</div></div>
+    <div><div class="lbl">Remediation Coverage</div><div class="progress"><div style="width:71%"></div></div><div class="lbl">71%</div></div>
+    <div><div class="lbl">Fix Verification</div><div class="progress"><div style="width:64%"></div></div><div class="lbl">64%</div></div>
+  </div>
+  <div style="margin-top:10px"><b>Overall Readiness: 79%</b></div>
+</div>
+
+<div class="grid g3">
+{% for name, status in report_defs %}
+<div class="card clickable" data-explain data-explain-eyebrow="Report" data-explain-title="{{ name }}" data-explain-body="<div class='mstat'><span>Status</span><b>{{ status }}</b></div><p style='margin-top:12px'>Use Generate to refresh this report with the latest findings, evidence, and certificate data, or Share to produce an org-internal link.</p>">
+  <div class="report-icon">&#9638;</div>
+  <h3>{{ name }}</h3>
+  <div class="lbl"><span class="pill {% if status == 'Ready' %}pass{% else %}warn{% endif %}">{{ status }}</span></div>
+  <form method="post" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+    {% csrf_token %}
+    <input type="hidden" name="name" value="{{ name }}">
+    <button class="btn" name="action" value="generate" type="submit">Generate</button>
+    <button class="btn" name="action" value="share" type="submit">Share</button>
+  </form>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

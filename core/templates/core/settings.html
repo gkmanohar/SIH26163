@@ -1,0 +1,42 @@
+{% extends "core/base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<h1>Settings</h1>
+<p class="sub">Scope controls, integrations, and platform safety configuration.</p>
+
+<div class="grid g2">
+  <div class="card"><h3>Authorized Target List</h3>
+  <table><tbody><tr><td>World Monitor – Local Lab</td><td><span class="pill pass">Active</span></td></tr>
+  <tr><td>http://localhost:3000</td><td><span class="pill pass">Allowed</span></td></tr></tbody></table>
+  </div>
+  <div class="card"><h3>Scope Controls</h3>
+  <label class="lbl"><input type="checkbox" checked disabled style="width:auto"> Disable public production scanning</label><br><br>
+  <span class="lbl">Sentinel Trinity is designed for authorized localhost, lab, or approved staging assessments only.</span>
+  </div>
+  <div class="card"><h3>IPC Command Snapshot</h3>
+  <table><tbody>
+  {% for c in ipc_all|slice:":5" %}
+    <tr><td>{{ c.name }}</td><td><span class="pill {% if c.status == 'Allowed' %}pass{% elif c.status == 'Blocked' %}fail{% else %}warn{% endif %}">{{ c.status }}</span></td></tr>
+  {% endfor %}
+  </tbody></table>
+  </div>
+  <div class="card"><h3>User Role Management</h3>
+  <table><tbody>
+  <tr><td>G. Manohar</td><td>Lead Analyst</td></tr>
+  <tr><td>K. Iyer</td><td>AI Security Analyst</td></tr>
+  <tr><td>S. Nair</td><td>Protocol Analyst</td></tr>
+  <tr><td>A. Rao</td><td>Desktop Security Analyst</td></tr>
+  </tbody></table>
+  </div>
+  <div class="card"><h3>Integrations</h3>
+  <form method="post" style="display:flex;gap:8px;flex-wrap:wrap">
+    {% csrf_token %}
+    <button class="btn" type="submit">Connect GitHub</button>
+    <button class="btn" type="submit">Connect Jira</button>
+    <button class="btn" type="submit">Connect Slack</button>
+    <button class="btn" type="submit">Connect SIEM</button>
+  </form>
+  <div class="lbl" style="margin-top:8px">Mock connectors — no real OAuth is performed.</div>
+  </div>
+</div>
+{% endblock %}

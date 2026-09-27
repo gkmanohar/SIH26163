@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block title %}Attack Surface{% endblock %}
+{% block content %}
+<h1>Attack Surface</h1>
+<p class="sub">Trust-boundary inventory across the World Monitor local lab deployment.</p>
+<div class="hero-strip">
+  <span class="chip">&#10022; AI Layer</span><span class="chip">&#8644; API Layer</span><span class="chip">&#8962; Desktop Layer</span><span class="chip">&#9636; Data Layer</span><span class="chip">&#128274; Auth Layer</span>
+</div>
+<div class="grid g4" style="margin-bottom:16px">
+  <div class="card kpi clickable" data-explain data-explain-eyebrow="Inventory" data-explain-title="Total Assets" data-explain-body="<div class='mstat'><span>Assets tracked</span><b>23</b></div><p style='margin-top:12px'>Every discovered node across the AI, API, desktop, data, and auth layers of the World Monitor local lab.</p>"><div class="icon-tile">&#9670;</div><div class="val" data-count="23">23</div><div class="lbl">Total Assets</div></div>
+  <div class="card kpi clickable" data-explain data-explain-eyebrow="Boundaries" data-explain-title="Trust Boundaries" data-explain-body="<div class='mstat'><span>Boundaries mapped</span><b>16</b></div><p style='margin-top:12px'>Points where data or control crosses between differently-trusted components — the primary places attackers pivot.</p>"><div class="icon-tile">&#9878;</div><div class="val" data-count="16">16</div><div class="lbl">Trust Boundaries</div></div>
+  <div class="card kpi clickable" data-explain data-explain-eyebrow="Connectivity" data-explain-title="External Integrations" data-explain-body="<div class='mstat'><span>Integrations</span><b>34</b></div><p style='margin-top:12px'>External feeds, APIs, and services the platform talks to — each is a potential injection or spoofing surface.</p>"><div class="icon-tile">&#8644;</div><div class="val" data-count="34">34</div><div class="lbl">External Integrations</div></div>
+  <div class="card kpi crit clickable" data-explain data-explain-eyebrow="Priority" data-explain-title="High-Risk Paths" data-explain-body="<div class='mstat'><span>High-risk paths</span><b>3</b></div><p style='margin-top:12px'>Chains of trust boundaries flagged 'At Risk' below that, combined, could allow an attacker to move from an external input to a sensitive internal action.</p>"><div class="icon-tile">&#9888;</div><div class="val" data-count="3">3</div><div class="lbl">High-Risk Paths</div></div>
+</div>
+<div class="card">
+  <h3>Trust Boundary Inventory</h3>
+  <table><thead><tr><th>Asset</th><th>Category</th><th>Status</th></tr></thead><tbody>
+  {% for name, cat, status in nodes %}
+    <tr class="row-clickable" data-explain data-explain-eyebrow="Asset" data-explain-title="{{ name }}" data-explain-body="<div class='mstat'><span>Category</span><b>{{ cat }}</b></div><div class='mstat'><span>Status</span><b>{{ status }}</b></div><p style='margin-top:12px'>Part of the {{ cat }} trust layer in the World Monitor local lab. {% if status == 'At Risk' %}Currently flagged at-risk — review linked findings on the Findings page.{% else %}Currently assessed with no open high-severity gaps.{% endif %}</p>"><td>{{ name }}</td><td style="text-transform:capitalize">{{ cat }}</td>
+    <td><span class="pill {% if status == 'At Risk' %}warn{% else %}pass{% endif %}">{{ status }}</span></td></tr>
+  {% endfor %}
+  </tbody></table>
+</div>
+{% endblock %}
