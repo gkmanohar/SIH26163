@@ -3,17 +3,29 @@ import os
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 
+DEMO_USERNAME = 'demo'
+DEMO_PASSWORD = 'Demo@1234'
+
 
 class Command(BaseCommand):
     help = (
-        "Create (or update the password of) an admin superuser from "
-        "DJANGO_SUPERUSER_USERNAME / DJANGO_SUPERUSER_EMAIL / "
-        "DJANGO_SUPERUSER_PASSWORD env vars. Safe to run on every deploy — "
-        "does nothing if those vars are not set, and does not error if the "
-        "user already exists."
+        "Create the public demo user (no admin rights) and, if the "
+        "DJANGO_SUPERUSER_* env vars are set, create/update the private "
+        "admin superuser. Safe to run on every deploy."
     )
 
     def handle(self, *args, **options):
+        User = get_user_model()
+
+        # Public demo account: not staff, not superuser -> cannot open /admin/
+        demo, _ = User.objects.get_or_create(username=DEMO_USERNAME)
+        demo.is_staff = False
+        demo.is_superuser = False
+        demo.set_password(DEMO_PASSWORD)
+        demo.save()
+        self.stdout.write(self.style.SUCCESS(f'Demo user "{DEMO_USERNAME}" ready.'))
+
+        # Private admin account (from env vars)
         username = os.environ.get('DJANGO_SUPERUSER_USERNAME')
         password = os.environ.get('DJANGO_SUPERUSER_PASSWORD')
         email = os.environ.get('DJANGO_SUPERUSER_EMAIL', '')
@@ -25,7 +37,6 @@ class Command(BaseCommand):
             )
             return
 
-        User = get_user_model()
         user, created = User.objects.get_or_create(
             username=username,
             defaults={'email': email, 'is_staff': True, 'is_superuser': True},
